@@ -137,6 +137,15 @@
     <Compile Include="Event\EventManager.cs" />
     <Compile Include="Event\GameEventArgs.cs" />
     <Compile Include="Event\IEventManager.cs" />
+    <Compile Include="FairyGUI\CloseViewCompleteEventArgs.cs" />
+    <Compile Include="FairyGUI\GUIManager.cs" />
+    <Compile Include="FairyGUI\GUIManager.GUIGroup.cs" />
+    <Compile Include="FairyGUI\IGUIGroup.cs" />
+    <Compile Include="FairyGUI\IGUIGroupHelper.cs" />
+    <Compile Include="FairyGUI\IGUIManager.cs" />
+    <Compile Include="FairyGUI\IViewController.cs" />
+    <Compile Include="FairyGUI\IViewControllerHelper.cs" />
+    <Compile Include="FairyGUI\OpenViewSuccessEventArgs.cs" />
     <Compile Include="FileSystem\CommonFileSystemStream.cs" />
     <Compile Include="FileSystem\FileInfo.cs" />
     <Compile Include="FileSystem\FileSystem.BlockData.cs" />
