@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------
 // Game Framework
-// Copyright © 2013-2020 Jiang Yin. All rights reserved.
+// Copyright © 2013-2021 Jiang Yin. All rights reserved.
 // Homepage: https://gameframework.cn/
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
@@ -714,8 +714,11 @@ namespace GameFramework.Resource
                 m_ResourceUpdater.Shutdown();
                 m_ResourceUpdater = null;
 
-                m_ReadWriteResourceInfos.Clear();
-                m_ReadWriteResourceInfos = null;
+                if (m_ReadWriteResourceInfos != null)
+                {
+                    m_ReadWriteResourceInfos.Clear();
+                    m_ReadWriteResourceInfos = null;
+                }
 
                 if (m_DecompressCachedStream != null)
                 {
@@ -847,7 +850,7 @@ namespace GameFramework.Resource
         {
             if (m_RefuseSetCurrentVariant)
             {
-                throw new GameFrameworkException("You can net set current variant at this time.");
+                throw new GameFrameworkException("You can not set current variant at this time.");
             }
 
             m_CurrentVariant = currentVariant;
@@ -1125,7 +1128,7 @@ namespace GameFramework.Resource
         }
 
         /// <summary>
-        /// 使用可更新模式并更新全部资源。
+        /// 使用可更新模式并更新所有资源。
         /// </summary>
         /// <param name="updateResourcesCompleteCallback">使用可更新模式并更新默认资源组完成时的回调函数。</param>
         public void UpdateResources(UpdateResourcesCompleteCallback updateResourcesCompleteCallback)
@@ -1773,6 +1776,27 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
         /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
+        /// <returns>实际加载了多少字节。</returns>
+        public int LoadBinarySegmentFromFileSystem(string binaryAssetName, byte[] buffer)
+        {
+            if (string.IsNullOrEmpty(binaryAssetName))
+            {
+                throw new GameFrameworkException("Binary asset name is invalid.");
+            }
+
+            if (buffer == null)
+            {
+                throw new GameFrameworkException("Buffer is invalid.");
+            }
+
+            return m_ResourceLoader.LoadBinarySegmentFromFileSystem(binaryAssetName, 0, buffer, 0, buffer.Length);
+        }
+
+        /// <summary>
+        /// 从文件系统中加载二进制资源的片段。
+        /// </summary>
+        /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
+        /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
         /// <param name="length">要加载片段的长度。</param>
         /// <returns>实际加载了多少字节。</returns>
         public int LoadBinarySegmentFromFileSystem(string binaryAssetName, byte[] buffer, int length)
@@ -1811,6 +1835,28 @@ namespace GameFramework.Resource
             }
 
             return m_ResourceLoader.LoadBinarySegmentFromFileSystem(binaryAssetName, 0, buffer, startIndex, length);
+        }
+
+        /// <summary>
+        /// 从文件系统中加载二进制资源的片段。
+        /// </summary>
+        /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
+        /// <param name="offset">要加载片段的偏移。</param>
+        /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
+        /// <returns>实际加载了多少字节。</returns>
+        public int LoadBinarySegmentFromFileSystem(string binaryAssetName, int offset, byte[] buffer)
+        {
+            if (string.IsNullOrEmpty(binaryAssetName))
+            {
+                throw new GameFrameworkException("Binary asset name is invalid.");
+            }
+
+            if (buffer == null)
+            {
+                throw new GameFrameworkException("Buffer is invalid.");
+            }
+
+            return m_ResourceLoader.LoadBinarySegmentFromFileSystem(binaryAssetName, offset, buffer, 0, buffer.Length);
         }
 
         /// <summary>

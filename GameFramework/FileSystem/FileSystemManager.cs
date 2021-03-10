@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------
 // Game Framework
-// Copyright © 2013-2020 Jiang Yin. All rights reserved.
+// Copyright © 2013-2021 Jiang Yin. All rights reserved.
 // Homepage: https://gameframework.cn/
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace GameFramework.FileSystem
                 throw new GameFrameworkException("Full path is invalid.");
             }
 
-            return m_FileSystems.ContainsKey(fullPath);
+            return m_FileSystems.ContainsKey(Utility.Path.GetRegularPath(fullPath));
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace GameFramework.FileSystem
             }
 
             FileSystem fileSystem = null;
-            if (m_FileSystems.TryGetValue(fullPath, out fileSystem))
+            if (m_FileSystems.TryGetValue(Utility.Path.GetRegularPath(fullPath), out fileSystem))
             {
                 return fileSystem;
             }

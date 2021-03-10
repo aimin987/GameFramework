@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------
 // Game Framework
-// Copyright © 2013-2020 Jiang Yin. All rights reserved.
+// Copyright © 2013-2021 Jiang Yin. All rights reserved.
 // Homepage: https://gameframework.cn/
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
@@ -137,6 +137,14 @@ namespace GameFramework.FileSystem
         /// </summary>
         /// <param name="name">要读取片段的文件名称。</param>
         /// <param name="buffer">存储读取文件片段内容的二进制流。</param>
+        /// <returns>实际读取了多少字节。</returns>
+        int ReadFileSegment(string name, byte[] buffer);
+
+        /// <summary>
+        /// 读取指定文件的指定片段。
+        /// </summary>
+        /// <param name="name">要读取片段的文件名称。</param>
+        /// <param name="buffer">存储读取文件片段内容的二进制流。</param>
         /// <param name="length">要读取片段的长度。</param>
         /// <returns>实际读取了多少字节。</returns>
         int ReadFileSegment(string name, byte[] buffer, int length);
@@ -150,6 +158,15 @@ namespace GameFramework.FileSystem
         /// <param name="length">要读取片段的长度。</param>
         /// <returns>实际读取了多少字节。</returns>
         int ReadFileSegment(string name, byte[] buffer, int startIndex, int length);
+
+        /// <summary>
+        /// 读取指定文件的指定片段。
+        /// </summary>
+        /// <param name="name">要读取片段的文件名称。</param>
+        /// <param name="offset">要读取片段的偏移。</param>
+        /// <param name="buffer">存储读取文件片段内容的二进制流。</param>
+        /// <returns>实际读取了多少字节。</returns>
+        int ReadFileSegment(string name, int offset, byte[] buffer);
 
         /// <summary>
         /// 读取指定文件的指定片段。

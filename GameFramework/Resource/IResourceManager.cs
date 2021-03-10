@@ -1,6 +1,6 @@
 ﻿//------------------------------------------------------------
 // Game Framework
-// Copyright © 2013-2020 Jiang Yin. All rights reserved.
+// Copyright © 2013-2021 Jiang Yin. All rights reserved.
 // Homepage: https://gameframework.cn/
 // Feedback: mailto:ellan@gameframework.cn
 //------------------------------------------------------------
@@ -437,7 +437,7 @@ namespace GameFramework.Resource
         void ApplyResources(string resourcePackPath, ApplyResourcesCompleteCallback applyResourcesCompleteCallback);
 
         /// <summary>
-        /// 使用可更新模式并更新全部资源。
+        /// 使用可更新模式并更新所有资源。
         /// </summary>
         /// <param name="updateResourcesCompleteCallback">使用可更新模式并更新默认资源组完成时的回调函数。</param>
         void UpdateResources(UpdateResourcesCompleteCallback updateResourcesCompleteCallback);
@@ -681,6 +681,14 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
         /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
+        /// <returns>实际加载了多少字节。</returns>
+        int LoadBinarySegmentFromFileSystem(string binaryAssetName, byte[] buffer);
+
+        /// <summary>
+        /// 从文件系统中加载二进制资源的片段。
+        /// </summary>
+        /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
+        /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
         /// <param name="length">要加载片段的长度。</param>
         /// <returns>实际加载了多少字节。</returns>
         int LoadBinarySegmentFromFileSystem(string binaryAssetName, byte[] buffer, int length);
@@ -694,6 +702,15 @@ namespace GameFramework.Resource
         /// <param name="length">要加载片段的长度。</param>
         /// <returns>实际加载了多少字节。</returns>
         int LoadBinarySegmentFromFileSystem(string binaryAssetName, byte[] buffer, int startIndex, int length);
+
+        /// <summary>
+        /// 从文件系统中加载二进制资源的片段。
+        /// </summary>
+        /// <param name="binaryAssetName">要加载片段的二进制资源的名称。</param>
+        /// <param name="offset">要加载片段的偏移。</param>
+        /// <param name="buffer">存储加载二进制资源片段内容的二进制流。</param>
+        /// <returns>实际加载了多少字节。</returns>
+        int LoadBinarySegmentFromFileSystem(string binaryAssetName, int offset, byte[] buffer);
 
         /// <summary>
         /// 从文件系统中加载二进制资源的片段。
