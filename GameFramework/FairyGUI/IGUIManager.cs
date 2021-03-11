@@ -106,12 +106,6 @@ namespace GameFramework.FairyGUI
         IViewController GetViewController(string viewName);
 
         /// <summary>
-        /// 获取全部界面控制器
-        /// </summary>
-        /// <returns></returns>
-        IViewController[] GetAllViewControllers();
-
-        /// <summary>
         /// 打开界面
         /// </summary>
         /// <param name="viewId">界面编号</param>
@@ -137,9 +131,5 @@ namespace GameFramework.FairyGUI
         /// 关闭所有界面
         /// </summary>
         void CloseAllViews();
-
-        //void AddGUIAsset(string packageName, object asset);
-
-        //void RemoveGUIAsset(string packageName);
     }
 }

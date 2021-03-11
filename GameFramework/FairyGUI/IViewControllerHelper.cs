@@ -30,18 +30,6 @@ namespace GameFramework.FairyGUI
         string GetGroupName(int viewId);
 
         /// <summary>
-        /// 激活界面控制器
-        /// </summary>
-        /// <param name="viewController"></param>
-        void ActivateViewController(IViewController viewController);
-
-        /// <summary>
-        /// 使界面控制器失效
-        /// </summary>
-        /// <param name="viewController"></param>
-        void DeactivateViewController(IViewController viewController);
-
-        /// <summary>
         /// 移除包
         /// </summary>
         /// <param name="packageName"></param>

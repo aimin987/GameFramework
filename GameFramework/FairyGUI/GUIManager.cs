@@ -330,10 +330,8 @@ namespace GameFramework.FairyGUI
             IViewController viewController = group.GetViewController(viewId);
             if (viewController != null)
             {
-                if (viewController.IsLocked)
-                {
-                    m_ViewControllerHelper.ActivateViewController(viewController);
-                }
+                viewController.OnShow(userData);
+                viewController.OnOpen(animated);
             }
             else
             {
@@ -377,7 +375,7 @@ namespace GameFramework.FairyGUI
         {
             if (viewController.IsLocked)
             {
-                m_ViewControllerHelper.DeactivateViewController(viewController);
+                viewController.OnClose(animated);
             }
             else
             {
@@ -390,12 +388,6 @@ namespace GameFramework.FairyGUI
             {
                 m_CloseViewCompleteEventHandler(this, new CloseViewCompleteEventArgs(viewController.ViewId, viewController.ViewName, viewController.GroupName, null));
             }
-        }
-
-
-        public IViewController[] GetAllViewControllers()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
