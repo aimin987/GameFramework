@@ -58,7 +58,7 @@ namespace GameFramework.FairyGUI
         /// <summary>
         /// 关闭界面
         /// </summary>
-        void OnHide();
+        void OnHide(bool destory);
 
         /// <summary>
         /// 界面打开
