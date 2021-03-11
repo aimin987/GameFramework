@@ -33,12 +33,6 @@ namespace GameFramework.FairyGUI
         bool IsLocked { get; }
 
         /// <summary>
-        /// 是否在关闭时自动移除资源包(配置)
-        /// </summary>
-        /// <returns></returns>
-        bool AutoRemovePackage { get; }
-
-        /// <summary>
         /// 激活
         /// </summary>
         /// <value></value>
@@ -50,21 +44,11 @@ namespace GameFramework.FairyGUI
         void OnInit();
 
         /// <summary>
-        /// 显示界面
-        /// </summary>
-        /// <param name="userData"></param>
-        void OnShow(object userData);
-
-        /// <summary>
-        /// 关闭界面
-        /// </summary>
-        void OnHide(bool destory);
-
-        /// <summary>
         /// 界面打开
         /// </summary>
-        /// <param name="animated">是否动画</param>
-        void OnOpen(bool animated);
+        /// <param name="animated"></param>
+        /// <param name="userData"></param>
+        void OnOpen(bool animated, object userData);
 
         /// <summary>
         /// 界面关闭

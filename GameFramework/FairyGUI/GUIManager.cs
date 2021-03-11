@@ -330,15 +330,13 @@ namespace GameFramework.FairyGUI
             IViewController viewController = group.GetViewController(viewId);
             if (viewController != null)
             {
-                viewController.OnShow(userData);
-                viewController.OnOpen(animated);
+                viewController.OnOpen(animated, userData);
             }
             else
             {
                 viewController = m_ViewControllerHelper.CreateViewController(viewId, userData);
                 viewController.OnInit();
-                viewController.OnShow(userData);
-                viewController.OnOpen(animated);
+                viewController.OnOpen(animated, userData);
                 group.AddViewController(viewController);
             }
 
