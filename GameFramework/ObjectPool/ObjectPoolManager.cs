@@ -21,6 +21,7 @@ namespace GameFramework.ObjectPool
 
         private readonly Dictionary<TypeNamePair, ObjectPoolBase> m_ObjectPools;
         private readonly List<ObjectPoolBase> m_CachedAllObjectPools;
+        private readonly Comparison<ObjectPoolBase> m_ObjectPoolComparer;
 
         /// <summary>
         /// 初始化对象池管理器的新实例。
@@ -29,6 +30,7 @@ namespace GameFramework.ObjectPool
         {
             m_ObjectPools = new Dictionary<TypeNamePair, ObjectPoolBase>();
             m_CachedAllObjectPools = new List<ObjectPoolBase>();
+            m_ObjectPoolComparer = ObjectPoolComparer;
         }
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace GameFramework.ObjectPool
         {
             get
             {
-                return 90;
+                return 6;
             }
         }
 
@@ -335,7 +337,7 @@ namespace GameFramework.ObjectPool
                     results.Add(objectPool.Value);
                 }
 
-                results.Sort(ObjectPoolComparer);
+                results.Sort(m_ObjectPoolComparer);
                 return results.ToArray();
             }
             else
@@ -371,7 +373,7 @@ namespace GameFramework.ObjectPool
 
             if (sort)
             {
-                results.Sort(ObjectPoolComparer);
+                results.Sort(m_ObjectPoolComparer);
             }
         }
 
@@ -1249,7 +1251,7 @@ namespace GameFramework.ObjectPool
             TypeNamePair typeNamePair = new TypeNamePair(typeof(T), name);
             if (HasObjectPool<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist object pool '{0}'.", typeNamePair.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist object pool '{0}'.", typeNamePair));
             }
 
             ObjectPool<T> objectPool = new ObjectPool<T>(name, allowMultiSpawn, autoReleaseInterval, capacity, expireTime, priority);
@@ -1272,7 +1274,7 @@ namespace GameFramework.ObjectPool
             TypeNamePair typeNamePair = new TypeNamePair(objectType, name);
             if (HasObjectPool(objectType, name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist object pool '{0}'.", typeNamePair.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Already exist object pool '{0}'.", typeNamePair));
             }
 
             Type objectPoolType = typeof(ObjectPool<>).MakeGenericType(objectType);
@@ -1293,7 +1295,7 @@ namespace GameFramework.ObjectPool
             return false;
         }
 
-        private int ObjectPoolComparer(ObjectPoolBase a, ObjectPoolBase b)
+        private static int ObjectPoolComparer(ObjectPoolBase a, ObjectPoolBase b)
         {
             return a.Priority.CompareTo(b.Priority);
         }

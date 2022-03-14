@@ -21,7 +21,6 @@ namespace GameFramework.Download
             private string m_DownloadUri;
             private int m_FlushSize;
             private float m_Timeout;
-            private object m_UserData;
 
             /// <summary>
             /// 初始化下载任务的新实例。
@@ -33,7 +32,6 @@ namespace GameFramework.Download
                 m_DownloadUri = null;
                 m_FlushSize = 0;
                 m_Timeout = 0f;
-                m_UserData = null;
             }
 
             /// <summary>
@@ -96,17 +94,6 @@ namespace GameFramework.Download
             }
 
             /// <summary>
-            /// 获取用户自定义数据。
-            /// </summary>
-            public object UserData
-            {
-                get
-                {
-                    return m_UserData;
-                }
-            }
-
-            /// <summary>
             /// 获取下载任务的描述。
             /// </summary>
             public override string Description
@@ -122,20 +109,20 @@ namespace GameFramework.Download
             /// </summary>
             /// <param name="downloadPath">下载后存放路径。</param>
             /// <param name="downloadUri">原始下载地址。</param>
+            /// <param name="tag">下载任务的标签。</param>
             /// <param name="priority">下载任务的优先级。</param>
             /// <param name="flushSize">将缓冲区写入磁盘的临界大小。</param>
             /// <param name="timeout">下载超时时长，以秒为单位。</param>
             /// <param name="userData">用户自定义数据。</param>
             /// <returns>创建的下载任务。</returns>
-            public static DownloadTask Create(string downloadPath, string downloadUri, int priority, int flushSize, float timeout, object userData)
+            public static DownloadTask Create(string downloadPath, string downloadUri, string tag, int priority, int flushSize, float timeout, object userData)
             {
                 DownloadTask downloadTask = ReferencePool.Acquire<DownloadTask>();
-                downloadTask.Initialize(++s_Serial, priority);
+                downloadTask.Initialize(++s_Serial, tag, priority, userData);
                 downloadTask.m_DownloadPath = downloadPath;
                 downloadTask.m_DownloadUri = downloadUri;
                 downloadTask.m_FlushSize = flushSize;
                 downloadTask.m_Timeout = timeout;
-                downloadTask.m_UserData = userData;
                 return downloadTask;
             }
 
@@ -150,7 +137,6 @@ namespace GameFramework.Download
                 m_DownloadUri = null;
                 m_FlushSize = 0;
                 m_Timeout = 0f;
-                m_UserData = null;
             }
         }
     }

@@ -30,7 +30,6 @@ namespace GameFramework.Network
         public NetworkManager()
         {
             m_NetworkChannels = new Dictionary<string, NetworkChannelBase>(StringComparer.Ordinal);
-
             m_NetworkConnectedEventHandler = null;
             m_NetworkClosedEventHandler = null;
             m_NetworkMissHeartBeatEventHandler = null;
@@ -252,7 +251,7 @@ namespace GameFramework.Network
                     break;
 
                 default:
-                    throw new GameFrameworkException(Utility.Text.Format("Not supported service type '{0}'.", serviceType.ToString()));
+                    throw new GameFrameworkException(Utility.Text.Format("Not supported service type '{0}'.", serviceType));
             }
 
             networkChannel.NetworkChannelConnected += OnNetworkChannelConnected;

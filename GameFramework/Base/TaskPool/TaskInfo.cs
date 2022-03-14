@@ -15,8 +15,11 @@ namespace GameFramework
     [StructLayout(LayoutKind.Auto)]
     public struct TaskInfo
     {
+        private readonly bool m_IsValid;
         private readonly int m_SerialId;
+        private readonly string m_Tag;
         private readonly int m_Priority;
+        private readonly object m_UserData;
         private readonly TaskStatus m_Status;
         private readonly string m_Description;
 
@@ -24,15 +27,31 @@ namespace GameFramework
         /// 初始化任务信息的新实例。
         /// </summary>
         /// <param name="serialId">任务的序列编号。</param>
+        /// <param name="tag">任务的标签。</param>
         /// <param name="priority">任务的优先级。</param>
+        /// <param name="userData">任务的用户自定义数据。</param>
         /// <param name="status">任务状态。</param>
         /// <param name="description">任务描述。</param>
-        public TaskInfo(int serialId, int priority, TaskStatus status, string description)
+        public TaskInfo(int serialId, string tag, int priority, object userData, TaskStatus status, string description)
         {
+            m_IsValid = true;
             m_SerialId = serialId;
+            m_Tag = tag;
             m_Priority = priority;
+            m_UserData = userData;
             m_Status = status;
             m_Description = description;
+        }
+
+        /// <summary>
+        /// 获取任务信息是否有效。
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                return m_IsValid;
+            }
         }
 
         /// <summary>
@@ -42,7 +61,28 @@ namespace GameFramework
         {
             get
             {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
                 return m_SerialId;
+            }
+        }
+
+        /// <summary>
+        /// 获取任务的标签。
+        /// </summary>
+        public string Tag
+        {
+            get
+            {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
+                return m_Tag;
             }
         }
 
@@ -53,7 +93,28 @@ namespace GameFramework
         {
             get
             {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
                 return m_Priority;
+            }
+        }
+
+        /// <summary>
+        /// 获取任务的用户自定义数据。
+        /// </summary>
+        public object UserData
+        {
+            get
+            {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
+                return m_UserData;
             }
         }
 
@@ -64,6 +125,11 @@ namespace GameFramework
         {
             get
             {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
                 return m_Status;
             }
         }
@@ -75,6 +141,11 @@ namespace GameFramework
         {
             get
             {
+                if (!m_IsValid)
+                {
+                    throw new GameFrameworkException("Data is invalid.");
+                }
+
                 return m_Description;
             }
         }

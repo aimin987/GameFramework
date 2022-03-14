@@ -9,6 +9,7 @@ using GameFramework.Download;
 using GameFramework.FileSystem;
 using GameFramework.ObjectPool;
 using System;
+using System.Collections.Generic;
 
 namespace GameFramework.Resource
 {
@@ -189,17 +190,17 @@ namespace GameFramework.Resource
         }
 
         /// <summary>
-        /// 获取候选更新资源数量。
+        /// 获取使用时下载的等待更新资源数量。
         /// </summary>
-        int UpdateCandidateCount
+        int UpdateWaitingWhilePlayingCount
         {
             get;
         }
 
         /// <summary>
-        /// 获取正在更新资源数量。
+        /// 获取候选更新资源数量。
         /// </summary>
-        int UpdatingCount
+        int UpdateCandidateCount
         {
             get;
         }
@@ -309,6 +310,26 @@ namespace GameFramework.Resource
         }
 
         /// <summary>
+        /// 资源校验开始事件。
+        /// </summary>
+        event EventHandler<ResourceVerifyStartEventArgs> ResourceVerifyStart;
+
+        /// <summary>
+        /// 资源校验成功事件。
+        /// </summary>
+        event EventHandler<ResourceVerifySuccessEventArgs> ResourceVerifySuccess;
+
+        /// <summary>
+        /// 资源校验失败事件。
+        /// </summary>
+        event EventHandler<ResourceVerifyFailureEventArgs> ResourceVerifyFailure;
+
+        /// <summary>
+        /// 资源应用开始事件。
+        /// </summary>
+        event EventHandler<ResourceApplyStartEventArgs> ResourceApplyStart;
+
+        /// <summary>
         /// 资源应用成功事件。
         /// </summary>
         event EventHandler<ResourceApplySuccessEventArgs> ResourceApplySuccess;
@@ -337,6 +358,11 @@ namespace GameFramework.Resource
         /// 资源更新失败事件。
         /// </summary>
         event EventHandler<ResourceUpdateFailureEventArgs> ResourceUpdateFailure;
+
+        /// <summary>
+        /// 资源更新全部完成事件。
+        /// </summary>
+        event EventHandler<ResourceUpdateAllCompleteEventArgs> ResourceUpdateAllComplete;
 
         /// <summary>
         /// 设置资源只读区路径。
@@ -417,10 +443,17 @@ namespace GameFramework.Resource
         /// </summary>
         /// <param name="versionListLength">版本资源列表大小。</param>
         /// <param name="versionListHashCode">版本资源列表哈希值。</param>
-        /// <param name="versionListZipLength">版本资源列表压缩后大小。</param>
-        /// <param name="versionListZipHashCode">版本资源列表压缩后哈希值。</param>
+        /// <param name="versionListCompressedLength">版本资源列表压缩后大小。</param>
+        /// <param name="versionListCompressedHashCode">版本资源列表压缩后哈希值。</param>
         /// <param name="updateVersionListCallbacks">版本资源列表更新回调函数集。</param>
-        void UpdateVersionList(int versionListLength, int versionListHashCode, int versionListZipLength, int versionListZipHashCode, UpdateVersionListCallbacks updateVersionListCallbacks);
+        void UpdateVersionList(int versionListLength, int versionListHashCode, int versionListCompressedLength, int versionListCompressedHashCode, UpdateVersionListCallbacks updateVersionListCallbacks);
+
+        /// <summary>
+        /// 使用可更新模式并校验资源。
+        /// </summary>
+        /// <param name="verifyResourceLengthPerFrame">每帧至少校验资源的大小，以字节为单位。</param>
+        /// <param name="verifyResourcesCompleteCallback">使用可更新模式并校验资源完成时的回调函数。</param>
+        void VerifyResources(int verifyResourceLengthPerFrame, VerifyResourcesCompleteCallback verifyResourcesCompleteCallback);
 
         /// <summary>
         /// 使用可更新模式并检查资源。
@@ -450,11 +483,28 @@ namespace GameFramework.Resource
         void UpdateResources(string resourceGroupName, UpdateResourcesCompleteCallback updateResourcesCompleteCallback);
 
         /// <summary>
+        /// 停止更新资源。
+        /// </summary>
+        void StopUpdateResources();
+
+        /// <summary>
         /// 校验资源包。
         /// </summary>
         /// <param name="resourcePackPath">要校验的资源包路径。</param>
         /// <returns>是否校验资源包成功。</returns>
         bool VerifyResourcePack(string resourcePackPath);
+
+        /// <summary>
+        /// 获取所有加载资源任务的信息。
+        /// </summary>
+        /// <returns>所有加载资源任务的信息。</returns>
+        TaskInfo[] GetAllLoadAssetInfos();
+
+        /// <summary>
+        /// 获取所有加载资源任务的信息。
+        /// </summary>
+        /// <param name="results">所有加载资源任务的信息。</param>
+        void GetAllLoadAssetInfos(List<TaskInfo> results);
 
         /// <summary>
         /// 检查资源是否存在。
@@ -754,9 +804,29 @@ namespace GameFramework.Resource
         IResourceGroup GetResourceGroup(string resourceGroupName);
 
         /// <summary>
-        /// 获取所有加载资源任务的信息。
+        /// 获取所有资源组。
         /// </summary>
-        /// <returns>所有加载资源任务的信息。</returns>
-        TaskInfo[] GetAllLoadAssetInfos();
+        /// <returns>所有资源组。</returns>
+        IResourceGroup[] GetAllResourceGroups();
+
+        /// <summary>
+        /// 获取所有资源组。
+        /// </summary>
+        /// <param name="results">所有资源组。</param>
+        void GetAllResourceGroups(List<IResourceGroup> results);
+
+        /// <summary>
+        /// 获取资源组集合。
+        /// </summary>
+        /// <param name="resourceGroupNames">要获取的资源组名称的集合。</param>
+        /// <returns>要获取的资源组集合。</returns>
+        IResourceGroupCollection GetResourceGroupCollection(params string[] resourceGroupNames);
+
+        /// <summary>
+        /// 获取资源组集合。
+        /// </summary>
+        /// <param name="resourceGroupNames">要获取的资源组名称的集合。</param>
+        /// <returns>要获取的资源组集合。</returns>
+        IResourceGroupCollection GetResourceGroupCollection(List<string> resourceGroupNames);
     }
 }

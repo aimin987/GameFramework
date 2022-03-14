@@ -22,8 +22,8 @@ namespace GameFramework.Resource
             private IDownloadManager m_DownloadManager;
             private int m_VersionListLength;
             private int m_VersionListHashCode;
-            private int m_VersionListZipLength;
-            private int m_VersionListZipHashCode;
+            private int m_VersionListCompressedLength;
+            private int m_VersionListCompressedHashCode;
 
             public GameFrameworkAction<string, string> VersionListUpdateSuccess;
             public GameFrameworkAction<string, string> VersionListUpdateFailure;
@@ -38,8 +38,8 @@ namespace GameFramework.Resource
                 m_DownloadManager = null;
                 m_VersionListLength = 0;
                 m_VersionListHashCode = 0;
-                m_VersionListZipLength = 0;
-                m_VersionListZipHashCode = 0;
+                m_VersionListCompressedLength = 0;
+                m_VersionListCompressedHashCode = 0;
 
                 VersionListUpdateSuccess = null;
                 VersionListUpdateFailure = null;
@@ -130,9 +130,9 @@ namespace GameFramework.Resource
             /// </summary>
             /// <param name="versionListLength">版本资源列表大小。</param>
             /// <param name="versionListHashCode">版本资源列表哈希值。</param>
-            /// <param name="versionListZipLength">版本资源列表压缩后大小。</param>
-            /// <param name="versionListZipHashCode">版本资源列表压缩后哈希值。</param>
-            public void UpdateVersionList(int versionListLength, int versionListHashCode, int versionListZipLength, int versionListZipHashCode)
+            /// <param name="versionListCompressedLength">版本资源列表压缩后大小。</param>
+            /// <param name="versionListCompressedHashCode">版本资源列表压缩后哈希值。</param>
+            public void UpdateVersionList(int versionListLength, int versionListHashCode, int versionListCompressedLength, int versionListCompressedHashCode)
             {
                 if (m_DownloadManager == null)
                 {
@@ -141,8 +141,8 @@ namespace GameFramework.Resource
 
                 m_VersionListLength = versionListLength;
                 m_VersionListHashCode = versionListHashCode;
-                m_VersionListZipLength = versionListZipLength;
-                m_VersionListZipHashCode = versionListZipHashCode;
+                m_VersionListCompressedLength = versionListCompressedLength;
+                m_VersionListCompressedHashCode = versionListCompressedHashCode;
                 string localVersionListFilePath = Utility.Path.GetRegularPath(Path.Combine(m_ResourceManager.m_ReadWritePath, RemoteVersionListFileName));
                 int dotPosition = RemoteVersionListFileName.LastIndexOf('.');
                 string latestVersionListFullNameWithCrc32 = Utility.Text.Format("{0}.{2:x8}.{1}", RemoteVersionListFileName.Substring(0, dotPosition), RemoteVersionListFileName.Substring(dotPosition + 1), m_VersionListHashCode);
@@ -157,42 +157,36 @@ namespace GameFramework.Resource
                     return;
                 }
 
-                using (FileStream fileStream = new FileStream(e.DownloadPath, FileMode.Open, FileAccess.ReadWrite))
+                try
                 {
-                    int length = (int)fileStream.Length;
-                    if (length != m_VersionListZipLength)
+                    using (FileStream fileStream = new FileStream(e.DownloadPath, FileMode.Open, FileAccess.ReadWrite))
                     {
-                        fileStream.Close();
-                        string errorMessage = Utility.Text.Format("Latest version list zip length error, need '{0}', downloaded '{1}'.", m_VersionListZipLength.ToString(), length.ToString());
-                        DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
-                        OnDownloadFailure(this, downloadFailureEventArgs);
-                        ReferencePool.Release(downloadFailureEventArgs);
-                        return;
-                    }
+                        int length = (int)fileStream.Length;
+                        if (length != m_VersionListCompressedLength)
+                        {
+                            fileStream.Close();
+                            string errorMessage = Utility.Text.Format("Latest version list compressed length error, need '{0}', downloaded '{1}'.", m_VersionListCompressedLength, length);
+                            DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
+                            OnDownloadFailure(this, downloadFailureEventArgs);
+                            ReferencePool.Release(downloadFailureEventArgs);
+                            return;
+                        }
 
-                    fileStream.Position = 0L;
-                    int hashCode = Utility.Verifier.GetCrc32(fileStream);
-                    if (hashCode != m_VersionListZipHashCode)
-                    {
-                        fileStream.Close();
-                        string errorMessage = Utility.Text.Format("Latest version list zip hash code error, need '{0}', downloaded '{1}'.", m_VersionListZipHashCode.ToString(), hashCode.ToString());
-                        DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
-                        OnDownloadFailure(this, downloadFailureEventArgs);
-                        ReferencePool.Release(downloadFailureEventArgs);
-                        return;
-                    }
-
-                    if (m_ResourceManager.m_DecompressCachedStream == null)
-                    {
-                        m_ResourceManager.m_DecompressCachedStream = new MemoryStream();
-                    }
-
-                    try
-                    {
                         fileStream.Position = 0L;
-                        m_ResourceManager.m_DecompressCachedStream.Position = 0L;
-                        m_ResourceManager.m_DecompressCachedStream.SetLength(0L);
-                        if (!Utility.Zip.Decompress(fileStream, m_ResourceManager.m_DecompressCachedStream))
+                        int hashCode = Utility.Verifier.GetCrc32(fileStream);
+                        if (hashCode != m_VersionListCompressedHashCode)
+                        {
+                            fileStream.Close();
+                            string errorMessage = Utility.Text.Format("Latest version list compressed hash code error, need '{0}', downloaded '{1}'.", m_VersionListCompressedHashCode, hashCode);
+                            DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
+                            OnDownloadFailure(this, downloadFailureEventArgs);
+                            ReferencePool.Release(downloadFailureEventArgs);
+                            return;
+                        }
+
+                        fileStream.Position = 0L;
+                        m_ResourceManager.PrepareCachedStream();
+                        if (!Utility.Compression.Decompress(fileStream, m_ResourceManager.m_CachedStream))
                         {
                             fileStream.Close();
                             string errorMessage = Utility.Text.Format("Unable to decompress latest version list '{0}'.", e.DownloadPath);
@@ -202,10 +196,11 @@ namespace GameFramework.Resource
                             return;
                         }
 
-                        if (m_ResourceManager.m_DecompressCachedStream.Length != m_VersionListLength)
+                        int uncompressedLength = (int)m_ResourceManager.m_CachedStream.Length;
+                        if (uncompressedLength != m_VersionListLength)
                         {
                             fileStream.Close();
-                            string errorMessage = Utility.Text.Format("Latest version list length error, need '{0}', downloaded '{1}'.", m_VersionListLength.ToString(), m_ResourceManager.m_DecompressCachedStream.Length.ToString());
+                            string errorMessage = Utility.Text.Format("Latest version list length error, need '{0}', downloaded '{1}'.", m_VersionListLength, uncompressedLength);
                             DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
                             OnDownloadFailure(this, downloadFailureEventArgs);
                             ReferencePool.Release(downloadFailureEventArgs);
@@ -214,27 +209,20 @@ namespace GameFramework.Resource
 
                         fileStream.Position = 0L;
                         fileStream.SetLength(0L);
-                        fileStream.Write(m_ResourceManager.m_DecompressCachedStream.GetBuffer(), 0, (int)m_ResourceManager.m_DecompressCachedStream.Length);
+                        fileStream.Write(m_ResourceManager.m_CachedStream.GetBuffer(), 0, uncompressedLength);
                     }
-                    catch (Exception exception)
+
+                    if (VersionListUpdateSuccess != null)
                     {
-                        fileStream.Close();
-                        string errorMessage = Utility.Text.Format("Unable to decompress latest version list '{0}' with error message '{1}'.", e.DownloadPath, exception.ToString());
-                        DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
-                        OnDownloadFailure(this, downloadFailureEventArgs);
-                        ReferencePool.Release(downloadFailureEventArgs);
-                        return;
-                    }
-                    finally
-                    {
-                        m_ResourceManager.m_DecompressCachedStream.Position = 0L;
-                        m_ResourceManager.m_DecompressCachedStream.SetLength(0L);
+                        VersionListUpdateSuccess(e.DownloadPath, e.DownloadUri);
                     }
                 }
-
-                if (VersionListUpdateSuccess != null)
+                catch (Exception exception)
                 {
-                    VersionListUpdateSuccess(e.DownloadPath, e.DownloadUri);
+                    string errorMessage = Utility.Text.Format("Update latest version list '{0}' with error message '{1}'.", e.DownloadPath, exception);
+                    DownloadFailureEventArgs downloadFailureEventArgs = DownloadFailureEventArgs.Create(e.SerialId, e.DownloadPath, e.DownloadUri, errorMessage, e.UserData);
+                    OnDownloadFailure(this, downloadFailureEventArgs);
+                    ReferencePool.Release(downloadFailureEventArgs);
                 }
             }
 

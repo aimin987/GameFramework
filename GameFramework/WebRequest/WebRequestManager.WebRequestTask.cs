@@ -20,7 +20,6 @@ namespace GameFramework.WebRequest
             private string m_WebRequestUri;
             private byte[] m_PostData;
             private float m_Timeout;
-            private object m_UserData;
 
             public WebRequestTask()
             {
@@ -28,7 +27,6 @@ namespace GameFramework.WebRequest
                 m_WebRequestUri = null;
                 m_PostData = null;
                 m_Timeout = 0f;
-                m_UserData = null;
             }
 
             /// <summary>
@@ -69,17 +67,6 @@ namespace GameFramework.WebRequest
             }
 
             /// <summary>
-            /// 获取用户自定义数据。
-            /// </summary>
-            public object UserData
-            {
-                get
-                {
-                    return m_UserData;
-                }
-            }
-
-            /// <summary>
             /// 获取 Web 请求任务的描述。
             /// </summary>
             public override string Description
@@ -95,18 +82,18 @@ namespace GameFramework.WebRequest
             /// </summary>
             /// <param name="webRequestUri">要发送的远程地址。</param>
             /// <param name="postData">要发送的数据流。</param>
+            /// <param name="tag">Web 请求任务的标签。</param>
             /// <param name="priority">Web 请求任务的优先级。</param>
             /// <param name="timeout">下载超时时长，以秒为单位。</param>
             /// <param name="userData">用户自定义数据。</param>
             /// <returns>创建的 Web 请求任务。</returns>
-            public static WebRequestTask Create(string webRequestUri, byte[] postData, int priority, float timeout, object userData)
+            public static WebRequestTask Create(string webRequestUri, byte[] postData, string tag, int priority, float timeout, object userData)
             {
                 WebRequestTask webRequestTask = ReferencePool.Acquire<WebRequestTask>();
-                webRequestTask.Initialize(++s_Serial, priority);
+                webRequestTask.Initialize(++s_Serial, tag, priority, userData);
                 webRequestTask.m_WebRequestUri = webRequestUri;
                 webRequestTask.m_PostData = postData;
                 webRequestTask.m_Timeout = timeout;
-                webRequestTask.m_UserData = userData;
                 return webRequestTask;
             }
 
@@ -120,7 +107,6 @@ namespace GameFramework.WebRequest
                 m_WebRequestUri = null;
                 m_PostData = null;
                 m_Timeout = 0f;
-                m_UserData = null;
             }
 
             /// <summary>

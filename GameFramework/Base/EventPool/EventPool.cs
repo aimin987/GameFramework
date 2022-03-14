@@ -66,16 +66,14 @@ namespace GameFramework
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
         public void Update(float elapseSeconds, float realElapseSeconds)
         {
-            while (m_Events.Count > 0)
+            lock (m_Events)
             {
-                Event eventNode = null;
-                lock (m_Events)
+                while (m_Events.Count > 0)
                 {
-                    eventNode = m_Events.Dequeue();
+                    Event eventNode = m_Events.Dequeue();
                     HandleEvent(eventNode.Sender, eventNode.EventArgs);
+                    ReferencePool.Release(eventNode);
                 }
-
-                ReferencePool.Release(eventNode);
             }
         }
 
@@ -152,11 +150,11 @@ namespace GameFramework
             }
             else if ((m_EventPoolMode & EventPoolMode.AllowMultiHandler) != EventPoolMode.AllowMultiHandler)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow multi handler.", id.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow multi handler.", id));
             }
             else if ((m_EventPoolMode & EventPoolMode.AllowDuplicateHandler) != EventPoolMode.AllowDuplicateHandler && Check(id, handler))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow duplicate handler.", id.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow duplicate handler.", id));
             }
             else
             {
@@ -199,7 +197,7 @@ namespace GameFramework
 
             if (!m_EventHandlers.Remove(id, handler))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not exists specified handler.", id.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not exists specified handler.", id));
             }
         }
 
@@ -280,7 +278,7 @@ namespace GameFramework
 
             if (noHandlerException)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow no handler.", e.Id.ToString()));
+                throw new GameFrameworkException(Utility.Text.Format("Event '{0}' not allow no handler.", e.Id));
             }
         }
     }
